@@ -44,7 +44,7 @@ Nmap done: 1 IP address (1 host up) scanned in 17.70 seconds
 
 Duas portas comuns em CTF's, 22 rodando ssh e a 80 um serviço web. De pronto identifico que é uma versão bem recente do OpenSSH, não lembro de ter lido nada a respeito de nenhuma falha relevante de segurança, parto para o serviço web.
 
-3) Com o intuito de identificar as URL's que estão executando sobre o Apache, executo o gobuster:
+3) Com o intuito de identificar as URL's que estão executando sob o Apache, executo o gobuster:
 ```
 root@parrot:~# gobuster dir -u http://192.168.56.104 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken
 ===============================================================
