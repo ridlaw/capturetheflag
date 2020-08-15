@@ -1,5 +1,5 @@
 1) Máquina importada no VirtualBox, executo o arp-scan para ver o endereço IP:
-
+```
 root@parrot:~# arp-scan --interface=eth0 192.168.56.0/24
 Interface: eth0, type: EN10MB, MAC: 08:00:27:79:a6:a0, IPv4: 192.168.56.105
 Starting arp-scan 1.9.7 with 256 hosts (https://github.com/royhills/arp-scan)
@@ -9,7 +9,7 @@ Starting arp-scan 1.9.7 with 256 hosts (https://github.com/royhills/arp-scan)
 
 7 packets received by filter, 0 packets dropped by kernel
 Ending arp-scan 1.9.7: 256 hosts scanned in 1.975 seconds (129.62 hosts/sec). 3 responded
-
+```
 Está rodando no endereço de final 104.
 
 2) Rodo o nmap para verificar as portas e serviços:
