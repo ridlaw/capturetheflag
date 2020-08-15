@@ -69,10 +69,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ```
 Checo o que está respondendo no contexto /cms. Tem um botão, eu clico e... Curioso testo uma possível abertura para Path Traversal ou Command Injection e recebo a primeira flag:
 
-<print>
-
 4) Executo novamente o gobuster a partir de /cms:
-
 ```
 root@parrot:~# gobuster dir -u http://192.168.56.104/cms -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken_cms
 ===============================================================
@@ -94,8 +91,6 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ===============================================================
 ```
 Checo o novo contexto identifico e me deparo com a seguinte página:
-
-<print>
 
 Uau, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
 ```
