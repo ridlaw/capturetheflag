@@ -159,7 +159,7 @@ alice
 ```
 Ótimo, agora sou a alice rsrs.
 
-10) Agora tenho permissão de acesso a um diretório que antes não conseguia abrir, o 'backup'. A, e tem outra flag lá.
+10) Agora tenho permissão de acesso a um diretório que antes não conseguia acessar, o 'backup'. A, e tem outra flag lá.
 
 11) Em mais uma nota do senhor root ele diz o seguinte:
 ```
