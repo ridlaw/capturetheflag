@@ -97,6 +97,8 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ```
 Checando o novo contexto me deparo com a seguinte página:
 
+![image](https://imgur.com/caXv3oO) 
+
 Hum, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
 ```
 root@parrot:~# nc -nlvp 31337
@@ -127,7 +129,7 @@ $ pwd
 Estou dentro! Agora vamos continuar caçando.
 
 5) Vou ao /home e encontro o diretório da alice, lá consigo mais uma flag. Lá também tem uma nota com o seguinte conteúdo:
-
+```
 Alice,
 
 Please do not install TrustMeCMS, I need check the source before
@@ -135,7 +137,7 @@ Please do not install TrustMeCMS, I need check the source before
 PS: I created a script to clear apache log during the tests
 
 root
-
+```
 Ok senhor root, obrigado pela informação.
 
 6) Ainda na home da alice tem um diretório chamado 'script', dentro dele um script em python e um .log, interessante.
