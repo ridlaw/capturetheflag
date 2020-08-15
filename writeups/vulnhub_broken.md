@@ -72,6 +72,7 @@ Checo o que está respondendo no contexto /cms. Tem um botão, eu clico e... Cur
 <print>
 
 4) Executo novamente o gobuster a partir de /cms:
+
 ```
 root@parrot:~# gobuster dir -u http://192.168.56.104/cms -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken_cms
 ===============================================================
