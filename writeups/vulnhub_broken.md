@@ -1,4 +1,7 @@
-1) Máquina importada no VirtualBox, executo o arp-scan para ver o endereço IP:
+Link para download: https://www.vulnhub.com/entry/broken-2020-1,470/
+Nível: _beginner for user flag and intermediate for root flag_.
+
+1) Máquina importada no VirtualBox, executo o _arp-scan_ para ver o endereço IP:
 ```
 root@parrot:~# arp-scan --interface=eth0 192.168.56.0/24
 Interface: eth0, type: EN10MB, MAC: 08:00:27:79:a6:a0, IPv4: 192.168.56.105
@@ -10,9 +13,9 @@ Starting arp-scan 1.9.7 with 256 hosts (https://github.com/royhills/arp-scan)
 7 packets received by filter, 0 packets dropped by kernel
 Ending arp-scan 1.9.7: 256 hosts scanned in 1.975 seconds (129.62 hosts/sec). 3 responded
 ```
-Está rodando no endereço de final 104.
+Está rodando no endereço de final **104**.
 
-2) Rodo o nmap para verificar as portas e serviços:
+2) Rodo o _nmap_ para verificar as portas e serviços:
 ```
 root@parrot:~# nmap -p- -sV -sC -T5 -A -oN nmap_broken 192.168.56.104
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-08-15 14:22 -03
@@ -42,9 +45,9 @@ OS and Service detection performed. Please report any incorrect results at https
 Nmap done: 1 IP address (1 host up) scanned in 17.70 seconds
 ```
 
-Duas portas comuns em CTF's, 22 rodando ssh e a 80 um serviço web. De pronto identifico que é uma versão bem recente do OpenSSH, não lembro de ter lido nada a respeito de nenhuma falha relevante de segurança, parto para o serviço web.
+Duas portas comuns em CTF's, 22 rodando ssh e a 80 um serviço web. De pronto identifico que é uma versão bem recente do _OpenSSH_, não lembro de ter lido nada a respeito de nenhuma falha relevante de segurança, parto para o serviço web.
 
-3) Com o intuito de identificar as URL's que estão executando sob o Apache, executo o gobuster:
+3) Com o intuito de identificar as URL's que estão executando sob o Apache, executo o _gobuster_:
 ```
 root@parrot:~# gobuster dir -u http://192.168.56.104 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken
 ===============================================================
@@ -67,9 +70,9 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ===============================================================
 2020/08/15 14:27:49 Finished
 ```
-Checo o que está respondendo no contexto /cms. Tem um botão, eu clico e... Curioso testo uma possível abertura para Path Traversal ou Command Injection e recebo a primeira flag:
+Checo o que está respondendo no contexto _/cms_. Tem um botão, eu clico e... Curioso testo uma possível abertura para **Path Traversal** (https://owasp.org/www-community/attacks/Path_Traversal) ou **Command Injection** (https://owasp.org/www-community/attacks/Command_Injection) e recebo a primeira flag (nada mais interessante por aqui).
 
-4) Executo novamente o gobuster a partir de /cms:
+4) Executo novamente o gobuster a partir de _/cms_:
 ```
 root@parrot:~# gobuster dir -u http://192.168.56.104/cms -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o gobuster_broken_cms
 ===============================================================
@@ -90,9 +93,9 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 2020/08/15 14:31:34 Finished
 ===============================================================
 ```
-Checo o novo contexto identifico e me deparo com a seguinte página:
+Checando o novo contexto me deparo com a seguinte página:
 
-Uau, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
+Hum, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
 ```
 root@parrot:~# nc -nlvp 31337
 listening on [any] 31337 ...
