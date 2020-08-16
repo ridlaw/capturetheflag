@@ -1,7 +1,6 @@
 ## Broken-2020: 1
 
 - Link para download: https://www.vulnhub.com/entry/broken-2020-1,470/
-- Nível: _beginner for user flag and intermediate for root flag_.
 
 1) Máquina importada no VirtualBox, executo o _arp-scan_ para ver o endereço IP:
 ```
