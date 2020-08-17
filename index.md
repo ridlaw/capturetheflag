@@ -1,2 +1,2 @@
-[Vulnhub Broken](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_broken)
-[Vulnhub Stapler](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_stapler)
+- [Vulnhub Broken](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_broken)
+- [Vulnhub Stapler](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_stapler)
