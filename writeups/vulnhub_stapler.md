@@ -160,6 +160,8 @@ Vou resumir, existe muita coisa para enumerar, acesso anônimo ao ftp e smb, o s
 
 3) Fui direto a porta 80. Lá está executando um serviço web disponibilizado via PHP. Ok, sei que esse tipo de serviço tem as suas especificidades, vou continuar enumerando.
 
+![imagem](https://raw.githubusercontent.com/ridlaw/capturetheflag/gh-pages/pics/web_phpcli.png)
+
 4) Fui até a porta 12380. Nada demais, uma página estática. No código fonte mais um usuário para a lista. Decido tentar algumas coisas com o Burp Suite e... mais um usuário para a lista rs (essa máquina é uma das que são destaques para exames como OSCP, elas tentam retratar a quantidade de serviços/ usuários que uma empresa pode manter). Via _gobuster_ não tenho nenhum retorno, já desconfiava que isso aconteceria pelo erro 'Bad Request' que peguei nas requisições via Burp.
 
 5) Bom, decido executar o nikto e continuar procurando (no passo dois em um dos serviços a serem visualizados, existe uma pasta _backup_ com um wordpress4.tar.gz, guardei isso na mente e continuei...):
@@ -172,6 +174,8 @@ Issuer:   /C=UK/ST=Somewhere in the middle of nowhere/L=Really, what are you mea
 + Entry '/blogblog/' in robots.txt returned a non-forbidden or redirect HTTP code (200)
 ```
 6) Bom, como eu não encontrei nada na execução do _gobuster_? A resposta está logo no inicio, o serviço que eu procuro está rodando em _HTTPS_. Encontrei um blog atrás de /blogblog, e como não poderia deixar de ser, é um Wordpress (passo 2 rs).
+
+![imagem](https://raw.githubusercontent.com/ridlaw/capturetheflag/gh-pages/pics/wordpress_blog.png)
 
 7) Leio os posts, vou pra cima e vou pra baixo e decido executar o wpscan (sem dúvidas a melhor ferramenta para o caso):
 
