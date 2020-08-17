@@ -96,7 +96,7 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 ```
 Checando o novo contexto me deparo com a seguinte página:
 
-[Link](https://imgur.com/caXv3oO) 
+![imagem](https://raw.githubusercontent.com/ridlaw/capturetheflag/gh-pages/pics/execucao_de_comando_broken.png) 
 
 Hum, será que podemos hackear qualquer servidor passando IP/porta? Vamos testar, executo um listener via netcat, coloco meu endereço IP e a porta que estou executando e clico em 'hack':
 ```
