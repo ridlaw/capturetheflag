@@ -284,5 +284,3 @@ wordpress.sql
               `----------`
 b6b545dc11b7a270f4bad23432190c75162c4a2b
 ```
-
-Bem divertida, segundo o criador existem 2 maneiras de conseguir entrar na máquina e 3 formas para escalar até o root, bom essas foram as que eu encontrei. Até mais.
