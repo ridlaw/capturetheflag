@@ -123,7 +123,11 @@ Vou até o 404.html e lá no código-fonte da página tem a seguinte string:
 THprM09ETTBOVEl4TUM5cGJtUmxlQzV3YUhBPSBDbG9zZXIh
 ```
 
-4) Parece ser base64, vou até o CyberChef e tenho o que parece ser uma URL `/978345210/index.php`. Vou até ela e tenho um formulário, de cara já abro o Burp Suite, pego o POST de login e executo o sqlmap:
+4) Parece ser base64, vou até o CyberChef e tenho o que parece ser uma URL `/978345210/index.php`:
+
+![imagem](https://raw.githubusercontent.com/ridlaw/capturetheflag/gh-pages/pics/formulario_lord.png)
+
+Vou até ela e tenho um formulário, de cara já abro o Burp Suite, pego o POST de login e executo o sqlmap:
 
 ```
 root@parrot:/tmp/lord# sqlmap -r post_exploit --batch -p admin,password                          
