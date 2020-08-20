@@ -1,2 +1,3 @@
 - [Vulnhub Broken](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_broken)
 - [Vulnhub Stapler](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_stapler)
+- [Vulnhub Lord](https://ridlaw.github.io/capturetheflag/writeups/vulnhub_lordoftheroot)
